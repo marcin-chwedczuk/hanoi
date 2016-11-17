@@ -5,6 +5,13 @@ const browserSync = require('browser-sync').create();
 const del = require('del');
 const wiredep = require('wiredep').stream;
 const runSequence = require('run-sequence');
+const concat = require('gulp-concat');
+const rollup = require('rollup-stream');
+const sourcemaps = require('gulp-sourcemaps');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const babel = require('rollup-plugin-babel');
+const includePaths = require('rollup-plugin-includepaths');
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
@@ -20,26 +27,73 @@ gulp.task('styles', () => {
       precision: 10,
       includePaths: ['.']
     }).on('error', $.sass.logError))
-    .pipe($.autoprefixer({browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']}))
+    .pipe($.autoprefixer({
+      browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']
+    }))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('.tmp/styles'))
-    .pipe(reload({stream: true}));
+    .pipe(reload({
+      stream: true
+    }));
 });
 
+
 gulp.task('scripts', () => {
-  return gulp.src('app/scripts/**/*.js')
-    .pipe($.plumber())
-    .pipe($.sourcemaps.init())
-    .pipe($.babel())
-    .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('.tmp/scripts'))
-    .pipe(reload({stream: true}));
+  return rollup({
+    entry: './app/scripts/main.js',
+    format: "iife",
+    sourceMap: true,
+    plugins: [babel({
+      exclude: 'node_modules/**',
+      "presets": [
+        [
+          "es2015-rollup"
+        ]
+      ],
+      "plugins": [
+        "external-helpers"
+      ]
+    }),
+    includePaths({
+      include: {},
+      paths: ['./app/scripts'],
+      external: [],
+      extensions: ['.js']
+    })]
+  })
+
+  .pipe(source('app.js'))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({
+    loadMaps: true
+  }))
+
+  // transform the code further here.
+
+  // if you want to output with a different name from the input file, use gulp-rename here.
+  //.pipe(rename('index.js'))
+
+  .pipe(sourcemaps.write('.'))
+  .pipe(gulp.dest('.tmp/scripts'));
+});
+
+gulp.task('libs', function() {
+  return gulp.src([
+      'node_modules/systemjs/dist/system.js',
+      'node_modules/babel-polyfill/dist/polyfill.js'
+    ])
+    .pipe(gulp.dest('dist/libs'));
 });
 
 function lint(files, options) {
   return gulp.src(files)
-    .pipe($.eslint({ fix: true }))
-    .pipe(reload({stream: true, once: true}))
+    .pipe($.eslint({
+      fix: true
+    }))
+    .pipe(reload({
+      stream: true,
+      once: true
+    }))
     .pipe($.eslint.format())
     .pipe($.if(!browserSync.active, $.eslint.failAfterError()));
 }
@@ -55,10 +109,17 @@ gulp.task('lint:test', () => {
 
 gulp.task('html', ['styles', 'scripts'], () => {
   return gulp.src('app/*.html')
-    .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
+    .pipe($.useref({
+      searchPath: ['.tmp', 'app', '.']
+    }))
     .pipe($.if('*.js', $.uglify()))
-    .pipe($.if('*.css', $.cssnano({safe: true, autoprefixer: false})))
-    .pipe($.if('*.html', $.htmlmin({collapseWhitespace: true})))
+    .pipe($.if('*.css', $.cssnano({
+      safe: true,
+      autoprefixer: false
+    })))
+    .pipe($.if('*.html', $.htmlmin({
+      collapseWhitespace: true
+    })))
     .pipe(gulp.dest('dist'));
 });
 
@@ -69,8 +130,8 @@ gulp.task('images', () => {
 });
 
 gulp.task('fonts', () => {
-  return gulp.src(require('main-bower-files')('**/*.{eot,svg,ttf,woff,woff2}', function (err) {})
-    .concat('app/fonts/**/*'))
+  return gulp.src(require('main-bower-files')('**/*.{eot,svg,ttf,woff,woff2}', function(err) {})
+      .concat('app/fonts/**/*'))
     .pipe($.if(dev, gulp.dest('.tmp/fonts'), gulp.dest('dist/fonts')));
 });
 
@@ -86,7 +147,7 @@ gulp.task('extras', () => {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 gulp.task('serve', () => {
-  runSequence(['clean', 'wiredep'], ['styles', 'scripts', 'fonts'], () => {
+  runSequence(['clean', 'wiredep'], ['styles', 'scripts', 'libs', 'fonts'], () => {
     browserSync.init({
       notify: false,
       port: 9000,
@@ -158,7 +219,10 @@ gulp.task('wiredep', () => {
 });
 
 gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras'], () => {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+  return gulp.src('dist/**/*').pipe($.size({
+    title: 'build',
+    gzip: true
+  }));
 });
 
 gulp.task('default', () => {
