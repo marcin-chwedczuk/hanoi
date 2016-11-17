@@ -74,7 +74,8 @@ gulp.task('scripts', () => {
   //.pipe(rename('index.js'))
 
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest('.tmp/scripts'));
+  .pipe(gulp.dest('.tmp/scripts'))
+  .pipe(reload({ stream: true }));
 });
 
 function lint(files, options) {
