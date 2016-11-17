@@ -1,4 +1,6 @@
 import generateRings from "ringFactory";
+import Pole from "pole";
+import Floor from "floor";
 import TrackballControls from "TrackballControls";
 
 (function() {
@@ -16,33 +18,12 @@ import TrackballControls from "TrackballControls";
     renderer.setSize(WIDTH, HEIGHT);
     renderer.setPixelRatio( window.devicePixelRatio );
 
-    // Add floor
-    (function() {
-        var FLOOR_SIZE = 5;
+  var loader = new THREE.TextureLoader();
 
-        var geometry = new THREE.PlaneGeometry(FLOOR_SIZE, FLOOR_SIZE, 10, 10);
-        /*var material = new THREE.MeshPhongMaterial({
-            color: 0xffff00,
-            side: THREE.DoubleSide,
-            wireframe: true
-        });*/
-        var loader = new THREE.TextureLoader();
-        loader.load("images/floor.jpg", function ( texture ) {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set( 4, 4 );
-
-            var material = new THREE.MeshBasicMaterial({
-                map: texture,
-                overdraw: 0.5
-            });
-
-            var floor = new THREE.Mesh( geometry, material );
-            floor.rotation.x = -Math.PI/2;
-            floor.position.y = -0.1;
-            scene.add(floor);
-        });
-
-    }());
+  loader.load("images/floor.jpg", (texture) => {
+    var floor = new Floor(8, texture);
+    floor.addToScene(scene);
+  });
 
     (function() {
         function buildAxis( src, dst, colorHex, dashed ) {
@@ -67,7 +48,7 @@ import TrackballControls from "TrackballControls";
             geom.vertices.push( dst.clone() );
             geom.computeLineDistances();
 
-            var axis = new THREE.Line( geom, mat, THREE.LinePieces );
+            var axis = new THREE.LineSegments( geom, mat, THREE.LinePieces );
 
             return axis;
         }
@@ -99,24 +80,26 @@ import TrackballControls from "TrackballControls";
         scene.add(axes);
     }());
 
-    function addPole(scene, x, z) {
+    function addPole(scene, x, z, texture) {
         var radius = 0.05;
         var height = 1.8;
-        var geometry = new THREE.CylinderGeometry( radius, radius, height, 32 );
-        var material = new THREE.MeshPhongMaterial( {color: 0xffff00} );
-        var cylinder = new THREE.Mesh( geometry, material );
 
-        cylinder.position.set(x, height/2, z);
-        scene.add( cylinder );
+        var pole = new Pole(radius, height, texture);
+        pole.addToScene(scene);
+        pole.position(x, height/2, z);
     }
 
-    addPole(scene, 1, 1);
-    addPole(scene, -1, 1);
+    loader.load("images/wood.jpg", (texture) => {
+      addPole(scene, 1, 1, texture);
+      addPole(scene, -1, 1, texture);
+    });
+
+
 
     // tower 1
     var rings = generateRings(8);
     var h = 0;
-    rings.forEach(ring => {
+    rings.reverse().forEach(ring => {
         ring.position(0, h, 0);
         h += ring.height;
         ring.addToScene(scene);
