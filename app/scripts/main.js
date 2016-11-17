@@ -1,5 +1,5 @@
 import generateRings from "ringFactory";
-
+import TrackballControls from "TrackballControls";
 
 (function() {
     "use strict";
@@ -117,7 +117,7 @@ import generateRings from "ringFactory";
     var rings = generateRings(8);
     var h = 0;
     rings.forEach(ring => {
-        ring.setPosition(0, h, 0);
+        ring.position(0, h, 0);
         h += ring.height;
         ring.addToScene(scene);
     });

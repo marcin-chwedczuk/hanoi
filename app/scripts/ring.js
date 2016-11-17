@@ -46,15 +46,15 @@ export default class Ring {
     }
 
     addToScene(scene) {
-        scene.add(this.mesh);
+        scene.add(this._mesh);
     }
 
     position(x, y, z) {
-        this.mesh.position(x, y, z);
+        this._mesh.position.set(x, y, z);
     }
 
     rotate(x, y, z) {
-        this.mesh.rotation(x, y, z);
+        this._mesh.rotation.set(x, y, z);
     }
 
     get height() {

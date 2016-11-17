@@ -77,14 +77,6 @@ gulp.task('scripts', () => {
   .pipe(gulp.dest('.tmp/scripts'));
 });
 
-gulp.task('libs', function() {
-  return gulp.src([
-      'node_modules/systemjs/dist/system.js',
-      'node_modules/babel-polyfill/dist/polyfill.js'
-    ])
-    .pipe(gulp.dest('dist/libs'));
-});
-
 function lint(files, options) {
   return gulp.src(files)
     .pipe($.eslint({
@@ -147,7 +139,7 @@ gulp.task('extras', () => {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 gulp.task('serve', () => {
-  runSequence(['clean', 'wiredep'], ['styles', 'scripts', 'libs', 'fonts'], () => {
+  runSequence(['clean', 'wiredep'], ['styles', 'scripts', 'fonts'], () => {
     browserSync.init({
       notify: false,
       port: 9000,
