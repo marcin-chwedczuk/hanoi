@@ -11,6 +11,9 @@ export default class D3Object {
   }
 
   position(x, y, z) {
+    if (arguments.length === 0)
+      return this._mesh.position;
+
     this._mesh.position.set(x, y, z);
   }
 

@@ -20,8 +20,7 @@ export default class Floor extends D3Object {
 
     var floor = new THREE.Mesh(geometry, material);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.1;
-
+    
     return floor;
   }
 }

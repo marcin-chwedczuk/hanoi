@@ -3,7 +3,8 @@
   "private": true,
   "dependencies": {
     "bootstrap-sass": "~3.3.5",
-    "three.js": "threejs#*"
+    "three.js": "threejs#*",
+    "es6-promise": "^4.0.5"
   },
   "overrides": {
     "bootstrap-sass": {
