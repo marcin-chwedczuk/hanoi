@@ -63,7 +63,7 @@ export default class World {
 			//controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
 		controls.enableDamping = true;
 		controls.dampingFactor = 0.15;
-		controls.enableZoom = false;
+		controls.enableZoom = true;
 
     controls.rotateSpeed = 0.3;
     this.controls = controls;
@@ -87,13 +87,31 @@ export default class World {
     });
 
     // poles
-    function addPole(scene, x, z, texture) {
+    var that = this;
+    function addPole(scene, x, z, texture, spriteTexture) {
         const radius = 0.05;
         const height = 1.2;
 
         let pole = new Pole(radius, height, texture);
         pole.addToScene(scene);
         pole.position(x, height/2, z);
+
+        if (spriteTexture) {
+          that._loadTexture(spriteTexture)
+           .then(texture => {
+             var material = new THREE.SpriteMaterial({ map: texture, fog: false });
+             var sprite = new THREE.Sprite(material);
+
+             texture.generateMipmaps = false;
+             texture.magFilter = THREE.NearestFilter;
+             texture.minFilter = THREE.NearestFilter;
+
+             let pos = pole.position();
+             sprite.position.set(pos.x, 0.4 + pole.height, pos.z);
+             scene.add(sprite);
+             sprite.visible = true;
+           });
+        }
 
         return pole;
     }
@@ -106,12 +124,12 @@ export default class World {
     });
 
     this.loader.load("images/wood.jpg", (texture) => {
-      this.to = addPole(this.scene, distanceBetweenPooles/2, -h/2, texture);
+      this.to = addPole(this.scene, distanceBetweenPooles/2, -h/2, texture, "images/to_sprite.png");
     });
 
     this._loadTexture("images/wood.jpg")
       .then((texture) => {
-        this.from = addPole(this.scene, -distanceBetweenPooles/2, -h/2, texture);
+         this.from = addPole(this.scene, -distanceBetweenPooles/2, -h/2, texture, "images/from_sprite.png");
       })
       .then(() => {
         // generate rings on from pole

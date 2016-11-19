@@ -4,6 +4,8 @@ export default class Pole extends D3Object {
 
   constructor(radius, height, texture) {
     super(Pole._createMesh(radius, height, texture));
+
+    this.height = height;
   }
 
   static _createMesh(radius, height, texture) {
