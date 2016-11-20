@@ -1,23 +1,32 @@
 
 export default class D3Object {
-  constructor(mesh) {
-    if (mesh == null)
-      throw new Error('mesh cannot be null');
-    this._mesh = mesh;
-  }
+    constructor(mesh) {
+        if (mesh == null)
+            throw new Error("mesh cannot be null");
+        this._mesh = mesh;
+    }
 
-  addToScene(scene) {
-    scene.add(this._mesh);
-  }
+    addToScene(scene) {
+        scene.add(this._mesh);
+        this._addToScene(scene);
+    }
 
-  position(x, y, z) {
-    if (arguments.length === 0)
-      return this._mesh.position;
+    _addToScene(scene) { } // eslint-disable-line
 
-    this._mesh.position.set(x, y, z);
-  }
+    position(x, y, z) {
+        if (arguments.length === 0)
+            return this._mesh.position;
 
-  rotate(x, y, z) {
-    this._mesh.rotation.set(x, y, z);
-  }
+        this._mesh.position.set(x, y, z);
+        this._positionChanged();
+    }
+
+    _positionChanged() { }
+
+    rotate(x, y, z) {
+        this._mesh.rotation.set(x, y, z);
+        this._rotationChanged();
+    }
+
+    _rotationChanged() { }
 }

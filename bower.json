@@ -4,7 +4,9 @@
   "dependencies": {
     "bootstrap-sass": "~3.3.5",
     "three.js": "threejs#*",
-    "es6-promise": "^4.0.5"
+    "es6-promise": "^4.0.5",
+    "babel-polyfilljs": "^6.19.0",
+    "babel-polyfill": "^0.0.1"
   },
   "overrides": {
     "bootstrap-sass": {

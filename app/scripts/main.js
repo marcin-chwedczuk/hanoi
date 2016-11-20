@@ -1,4 +1,4 @@
-import World from 'world';
+import World from "world";
 
 (function() {
     "use strict";
@@ -7,12 +7,13 @@ import World from 'world';
     const HEIGHT = 640;
 
     let world = new World(WIDTH, HEIGHT);
-
+    window.world = world;
+    
     // ----------------------------------------------------
 
     function render() {
-      world.render();
-      requestAnimationFrame( render );
+        world.render();
+        requestAnimationFrame( render );
     }
     render();
 
