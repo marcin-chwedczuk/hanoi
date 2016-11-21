@@ -1,3 +1,4 @@
+import TimeSource from 'timeSource';
 
 export default class Animation {
     static get HEIGHT() { return 2; }
@@ -9,6 +10,7 @@ export default class Animation {
 
         // distance per second
         this._speed = 1.5;
+        this._timeSource = new TimeSource();
 
         this._startMilis = this._currentTimeMilis();
         this._durationMilis = 3*1000;
@@ -30,7 +32,13 @@ export default class Animation {
         });
     }
 
+    startStop() {
+      return this._timeSource.startStop();
+    }
+
     update() {
+        if (this._timeSource.isPaused()) return true;
+
         let elapsedTime = this._currentTimeMilis() - this._startMilis;
 
         if (elapsedTime > this._durationMilis) {
@@ -41,11 +49,11 @@ export default class Animation {
             if (!this._promiseResolved) {
                 let animation = this;
                 this._resolve({
-                  end() { animation._promiseResolved = true; }
+                    end() { animation._promiseResolved = true; }
                 });
             }
             else {
-              return false;
+                return false;
             }
         }
         else if (elapsedTime > this._downMoveStartTime) {
@@ -100,6 +108,6 @@ export default class Animation {
     }
 
     _currentTimeMilis() {
-        return (new Date()).valueOf();
+        return this._timeSource.time();
     }
 }

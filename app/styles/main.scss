@@ -96,3 +96,26 @@ body {
     text-align: center;
 }
 
+.control-panel {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 8px;
+  margin: auto;
+  width: 800px;
+
+  .checkbox label {
+    font-weight: bold;
+  }
+
+  input[type="checkbox"] {
+    vertical-align: text-bottom;
+  }
+
+  .form-group {
+    margin-right: 15px;
+  }
+
+  .buttons-group {
+    margin-right: 0 !important;
+  }
+}

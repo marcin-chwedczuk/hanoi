@@ -33,6 +33,10 @@ export default class Pole extends D3Object {
         return this._rings.pop();
     }
 
+    ringCount() {
+      return this._rings.length;
+    }
+
     _addToScene(scene) {
         if (this._label) {
             scene.add(this._label);

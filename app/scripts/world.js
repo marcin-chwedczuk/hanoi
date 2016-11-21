@@ -5,25 +5,53 @@ import OrbitControls from "OrbitControls"; // eslint-disable-line
 import Animation from "animation";
 import hanoi from "hanoi";
 
-const RINGS_COUNT = 3;
+const DEFAULT_RINGS_COUNT = 3;
 
 export default class World {
 
     constructor(viewportWidth, viewportHeight) {
         this._setupThreeJs(viewportWidth, viewportHeight);
         this._setupCamera(viewportWidth, viewportHeight);
-    // this._setupTrackballControls();
         this._setupOrbitControls();
 
         this.scene = new THREE.Scene();
         this.loader = new THREE.TextureLoader();
+        this.showLabels = true;
 
-        this._setupLights();
-        this._buildScene();
+        this._discCount = DEFAULT_RINGS_COUNT;
 
-        this._initialized = false;
-        this._animation = { update() { return false; } };
-        this._hanoiMoves = hanoi(RINGS_COUNT, {from:1, to:3, using:2});
+        this.reset();
+    }
+
+    reset() {
+      this._initialized = false;
+      this.from = this.to = this.using = null;
+
+      this.scene.children.slice().forEach(obj => this.scene.remove(obj))
+
+      this._animation = {
+        started: false,
+        update() { return !this.started; },
+        startStop() { this.started = true; }
+      };
+      this._hanoiMoves = [].entries();
+
+      this._setupLights();
+      this._buildScene();
+    }
+
+    setShowLabels(value) {
+      this.showLabels = value;
+
+      [this.from, this.to].forEach(pole => {
+        if (pole) {
+          value ? pole.showLabel() : pole.hideLabel();
+        }
+      })
+    }
+
+    startStop() {
+      return this._animation.startStop();
     }
 
     moveRing(from, to) {
@@ -124,56 +152,65 @@ export default class World {
         });
 
     // poles
-        var that = this;
-        function addPole(scene, x, z, texture, spriteTextureUrl) {
+        let addPole = (scene, x, z, texture, spriteTextureUrl) => {
             const radius = 0.05;
             const height = 1.2;
 
-            return that._loadTexture(spriteTextureUrl)
-         .then(spriteTexture => {
-             let pole = new Pole(radius, height, texture, spriteTexture);
-             pole.addToScene(scene);
-             pole.position(x, height/2, z);
-             return pole;
-         });
-        }
+            return this._loadTexture(spriteTextureUrl)
+               .then(spriteTexture => {
+                   let pole = new Pole(radius, height, texture, spriteTexture);
+                   pole.addToScene(scene);
+                   pole.position(x, height/2, z);
+                   this.showLabels ? pole.showLabel() : pole.hideLabel();
+                   return pole;
+               });
+        };
 
     // poles will be placed in vertexes of equilateral triangle
         const distanceBetweenPooles = 2;
         let h = -Math.sqrt(3)*distanceBetweenPooles/2;
         this.loader.load("images/wood.jpg", (texture) => {
             addPole(this.scene, 0, h/2, texture)
-        .then((pole) => this.using = pole);
+              .then((pole) => this.using = pole);
         });
 
         this.loader.load("images/wood.jpg", (texture) => {
             addPole(this.scene, distanceBetweenPooles/2, -h/2, texture, "images/to_sprite.png")
-        .then((pole) => this.to = pole);
+              .then((pole) => this.to = pole);
         });
 
         this._loadTexture("images/wood.jpg")
-      .then((texture) => {
-          return addPole(this.scene, -distanceBetweenPooles/2, -h/2, texture, "images/from_sprite.png");
-      })
-      .then((pole) => {
-          this.from = pole;
+          .then((texture) => {
+              return addPole(this.scene, -distanceBetweenPooles/2, -h/2, texture, "images/from_sprite.png");
+          })
+          .then((pole) => {
+              this.from = pole;
 
-        // generate rings on from pole
-          let rings = generateRings(RINGS_COUNT);
-          let fromPolePosition = this.from.position();
-          let h = 0;
+              this._createRings();
+              this._setupAlgorithm();
 
-          rings.reverse().forEach(ring => {
-              ring.position(fromPolePosition.x, h, fromPolePosition.z);
-              ring.addToScene(this.scene);
-
-              this.from.pushRing(ring);
-
-              h += ring.height;
+              this._initialized = true;
           });
+        }
 
-          this._initialized = true;
+    _createRings() {
+      // generate rings on from pole
+      let rings = generateRings(this._discCount);
+      let fromPolePosition = this.from.position();
+      let h = 0;
+
+      rings.reverse().forEach(ring => {
+          ring.position(fromPolePosition.x, h, fromPolePosition.z);
+          ring.addToScene(this.scene);
+
+          this.from.pushRing(ring);
+
+          h += ring.height;
       });
+    }
+
+    _setupAlgorithm() {
+      this._hanoiMoves = hanoi(this.from.ringCount(), {from:1, to:3, using:2});
     }
 
     _loadTexture(imageUrl) {
