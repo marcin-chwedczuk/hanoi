@@ -6,6 +6,7 @@ import Animation from "animation";
 import hanoi from "hanoi";
 
 const DEFAULT_RINGS_COUNT = 3;
+const DEFAULT_ANIMATION_SPEED = 1;
 
 export default class World {
 
@@ -19,6 +20,7 @@ export default class World {
         this.showLabels = true;
 
         this._discCount = DEFAULT_RINGS_COUNT;
+        this._animationSpeedMultiplier = 1;
 
         this.reset();
     }
@@ -32,12 +34,20 @@ export default class World {
       this._animation = {
         started: false,
         update() { return !this.started; },
-        startStop() { this.started = true; }
+        startStop() { this.started = true; return true; }
       };
       this._hanoiMoves = [].entries();
 
       this._setupLights();
       this._buildScene();
+    }
+
+    setNumberOfDisks(n) {
+      this._discCount = n;
+    }
+
+    setAnimationSpeedMultiplier(n) {
+      this._animationSpeedMultiplier = n;
     }
 
     setShowLabels(value) {
@@ -60,7 +70,9 @@ export default class World {
 
         let ring = from.popRing();
 
-        this._animation = new Animation(from, to, ring);
+        this._animation = new Animation(from, to, ring,
+          DEFAULT_ANIMATION_SPEED*this._animationSpeedMultiplier);
+
         this._animation.completed.then((animtion) => {
             to.pushRing(ring);
             animtion.end();

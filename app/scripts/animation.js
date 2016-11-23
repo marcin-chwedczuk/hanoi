@@ -3,17 +3,17 @@ import TimeSource from 'timeSource';
 export default class Animation {
     static get HEIGHT() { return 2; }
 
-    constructor(fromPole, toPole, ring) {
+    constructor(fromPole, toPole, ring, speedOpt) {
         this._fromPole = fromPole;
         this._toPole = toPole;
         this._ring = ring;
 
         // distance per second
-        this._speed = 1.5;
+        this._speed = speedOpt || 1.5;
         this._timeSource = new TimeSource();
 
         this._startMilis = this._currentTimeMilis();
-        this._durationMilis = 3*1000;
+        this._durationMilis = 3*1000/this._speed;
 
         this._fromHeight = fromPole.top();
         this._toHeight = toPole.top();
