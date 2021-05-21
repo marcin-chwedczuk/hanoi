@@ -1,0 +1,30 @@
+name: Build and test project
+
+# Controls when the action will run.
+on:
+  push:
+    # On which branch
+    branches: ["master"]
+    # On which files
+    # paths: ["scripts/scripts.js", "styles/styles.scss"]
+  schedule:
+  # Every Tuesday at 1PM UTC
+  - cron: "0 13 * * 2"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      # Sets up node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: "Install Node modules"
+        run: npm ci
+      - name: "Install Bower dependencies"
+        run: bower install
+      - name: "Build project using Gulp 4"
+        run: gulp clean default
