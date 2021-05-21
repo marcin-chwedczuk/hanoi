@@ -13,7 +13,7 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
     this.object = object;
     this.domElement = ( domElement !== undefined ) ? domElement : document;
 
-	// API
+    // API
 
     this.enabled = true;
 
@@ -35,7 +35,7 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
 
     this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
-	// internals
+    // internals
 
     this.target = new THREE.Vector3();
 
@@ -63,20 +63,20 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
         _panStart = new THREE.Vector2(),
         _panEnd = new THREE.Vector2();
 
-	// for reset
+    // for reset
 
     this.target0 = this.target.clone();
     this.position0 = this.object.position.clone();
     this.up0 = this.object.up.clone();
 
-	// events
+    // events
 
     var changeEvent = { type: "change" };
     var startEvent = { type: "start" };
     var endEvent = { type: "end" };
 
 
-	// methods
+    // methods
 
     this.handleResize = function () {
 
@@ -90,7 +90,7 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
         } else {
 
             var box = this.domElement.getBoundingClientRect();
-			// adjustments come from similar code in the jquery offset() function
+            // adjustments come from similar code in the jquery offset() function
             var d = this.domElement.ownerDocument.documentElement;
             this.screen.left = box.left + window.pageXOffset - d.clientLeft;
             this.screen.top = box.top + window.pageYOffset - d.clientTop;
@@ -118,9 +118,9 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
         return function getMouseOnScreen( pageX, pageY ) {
 
             vector.set(
-				( pageX - _this.screen.left ) / _this.screen.width,
-				( pageY - _this.screen.top ) / _this.screen.height
-			);
+                ( pageX - _this.screen.left ) / _this.screen.width,
+                ( pageY - _this.screen.top ) / _this.screen.height
+            );
 
             return vector;
 
@@ -135,9 +135,9 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
         return function getMouseOnCircle( pageX, pageY ) {
 
             vector.set(
-				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
-				( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
-			);
+                ( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
+                ( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
+            );
 
             return vector;
 
@@ -350,7 +350,7 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
 
     };
 
-	// listeners
+    // listeners
 
     function keydown( event ) {
 
@@ -597,7 +597,7 @@ let TrackballControls = THREE.TrackballControls = function ( object, domElement 
 
     this.handleResize();
 
-	// force an update at start
+    // force an update at start
     this.update();
 
 };

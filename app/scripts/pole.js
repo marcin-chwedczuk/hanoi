@@ -34,7 +34,7 @@ export default class Pole extends D3Object {
     }
 
     ringCount() {
-      return this._rings.length;
+        return this._rings.length;
     }
 
     _addToScene(scene) {
@@ -74,7 +74,7 @@ export default class Pole extends D3Object {
         });
         var sprite = new THREE.Sprite(material);
 
-    // more crisp image
+        // more crisp image
         labelTexture.generateMipmaps = false;
         labelTexture.magFilter = THREE.NearestFilter;
         labelTexture.minFilter = THREE.NearestFilter;

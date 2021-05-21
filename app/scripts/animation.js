@@ -1,4 +1,4 @@
-import TimeSource from 'timeSource';
+import TimeSource from "timeSource";
 
 export default class Animation {
     static get HEIGHT() { return 2; }
@@ -33,7 +33,7 @@ export default class Animation {
     }
 
     startStop() {
-      return this._timeSource.startStop();
+        return this._timeSource.startStop();
     }
 
     update() {
@@ -59,7 +59,7 @@ export default class Animation {
         else if (elapsedTime > this._downMoveStartTime) {
             // move down
             let h = this._interpolate(elapsedTime-this._downMoveStartTime,
-              this._durationMilis-this._downMoveStartTime);
+                this._durationMilis-this._downMoveStartTime);
 
             let delta = (Animation.HEIGHT-this._toHeight)*h;
             let y = Animation.HEIGHT - delta;
@@ -73,7 +73,7 @@ export default class Animation {
             let {x:tx, z:tz} = this._toPole.position();
 
             let d = this._interpolate(elapsedTime-this._horizontalMoveStartTime,
-            this._downMoveStartTime-this._horizontalMoveStartTime);
+                this._downMoveStartTime-this._horizontalMoveStartTime);
             let nx = (tx - fx)*d + fx;
             let nz = (tz - fz)*d + fz;
 

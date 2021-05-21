@@ -23,19 +23,19 @@ export default class Ring extends D3Object {
         var N = 5,
             i;
 
-    // inner wall
+        // inner wall
         for (i = 0; i <= N; i++) {
             points.push(point(r, height * i / N));
         }
-    // ---->
+        // ---->
         for (i = 0; i <= N; i++) {
             points.push(point(r + (R - r) * i / N, height));
         }
-    // outher wall
+        // outher wall
         for (i = N; i >= 0; i--) {
             points.push(point(R, height * i / N));
         }
-    // <-----
+        // <-----
         for (i = N; i >= 0; i--) {
             points.push(point(r + (R - r) * i / N, 0));
         }
