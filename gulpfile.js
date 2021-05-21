@@ -2,7 +2,6 @@
 const gulp = require('gulp');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const browserSync = require('browser-sync').create();
-const del = require('del');
 const wiredep = require('wiredep').stream;
 const concat = require('gulp-concat');
 const rollup = require('rollup-stream');
@@ -28,9 +27,7 @@ function prepareStyles() {
         })
         .on('error', $.dartSass.logError)
     )
-    .pipe($.autoprefixer({
-      browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']
-    }))
+    .pipe($.autoprefixer())
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('.tmp/styles'))
     .pipe(browserSync.reload({
@@ -78,7 +75,7 @@ function prepareScripts() {
   .pipe(browserSync.reload({ stream: true }));
 }
 
-function runLinter(files, options) {
+function runLinter(files) {
   return gulp.src(files)
     .pipe($.eslint({
       fix: true
@@ -96,11 +93,6 @@ function lintCode() {
     .pipe(gulp.dest('app/scripts'));
 }
 
-function lintTests() {
-  return runLinter('test/spec/**/*.js')
-    .pipe(gulp.dest('test/spec'));
-}
-
 function bundleApp() {
   return gulp.src('app/*.html')
     .pipe($.useref({
@@ -116,8 +108,6 @@ function bundleApp() {
     })))
     .pipe(gulp.dest('dist'));
 }
-
-const html = gulp.series(prepareScripts, prepareStyles, bundleApp);
 
 function prepareImages() {
   return gulp.src('app/images/**/*')
@@ -174,7 +164,7 @@ function browserSyncReloadTask(done) {
   done();
 }
 
-function doServe() {
+function doServe(done) {
   browserSync.init({
     notify: false,
     port: 9000,
@@ -190,21 +180,17 @@ function doServe() {
     'app/*.html',
     'app/images/**/*',
     '.tmp/fonts/**/*'
-  ]).on('change', browserSyncReloadTask);
+  ], browserSyncReloadTask);
 
   gulp.watch('app/styles/**/*.scss', prepareStyles);
   gulp.watch('app/scripts/**/*.js', prepareScripts);
   gulp.watch('app/fonts/**/*', prepareFonts);
-  gulp.watch('bower.json', gulp.series(prepareFonts, prepareBowerDependencies));
+  gulp.watch('bower.json', gulp.parallel(prepareFonts, prepareBowerDependencies));
+
+  done();
 }
 
-exports.serve = gulp.series(
-  doClean,
-  prepareBowerDependencies,
-  gulp.parallel(prepareStyles, prepareScripts, prepareFonts),
-  doServe);
-
-function doServeDist() {
+function doServeDist(done) {
   browserSync.init({
     notify: false,
     port: 9000,
@@ -212,31 +198,10 @@ function doServeDist() {
       baseDir: ['dist']
     }
   });
+
+  done();
 }
 
-function doServeTest() {
-  browserSync.init({
-    notify: false,
-    port: 9000,
-    ui: false,
-    server: {
-      baseDir: 'test',
-      routes: {
-        '/scripts': '.tmp/scripts',
-        '/bower_components': 'bower_components'
-      }
-    }
-  });
-
-  gulp.watch('app/scripts/**/*.js', prepareScripts);
-
-  gulp.watch(['test/spec/**/*.js', 'test/index.html'])
-    .on('change', browserSyncReloadTask);
-
-  gulp.watch('test/spec/**/*.js', lintTests);
-}
-
-exports.serveTest = gulp.series(prepareScripts, doServeTest)
 
 function doBuild() {
   return gulp.src('dist/**/*').pipe($.size({
@@ -245,32 +210,37 @@ function doBuild() {
   }));
 }
 
-
 function setDevFalse(done) {
   dev = false;
   done();
 }
 
-exports.clean = gulp.series(doClean)
+exports.clean = gulp.series(doClean);
+
 exports.build = gulp.series(
   lintCode,
-  //prepareBowerDependencies,
   prepareScripts,
   prepareStyles,
   bundleApp,
   prepareImages,
   prepareFonts,
-  prepareExtras
-)
+  prepareExtras,
+  doBuild
+);
+
+exports.serve = gulp.series(
+  gulp.parallel(doClean, prepareBowerDependencies),
+  gulp.parallel(prepareStyles, prepareScripts, prepareFonts),
+  doServe);
+
 exports.default = gulp.series(
   setDevFalse,
-  doClean,
-  prepareBowerDependencies,
-  exports.build)
+  gulp.parallel(doClean, prepareBowerDependencies),
+  exports.build);
 
 exports.serveDist = gulp.series(
   exports.default,
-  doServeDist)
+  doServeDist);
 
 exports.listPlugins = function(done) {
   for (let k in $) {

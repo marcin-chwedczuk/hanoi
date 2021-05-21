@@ -1,8 +1,10 @@
 # Simple Hanoi tower puzzle animation
 
-TODO: Screenshot
+See it running [here](http://blog.marcinchwedczuk.pl/assets/apps/hanoi/index.html).
 
 ![Build Status](https://github.com/marcin-chwedczuk/hanoi/actions/workflows/ci.yml/badge.svg)
+
+![demo](docs/demo.png)
 
 ### Building
 
@@ -43,18 +45,7 @@ Build and start the game:
 ```
 $ npm install
 $ bower install
-$ gulp clean serve
+$ gulp clean serveDist
 ```
 Enjoy! :tada:
 
-TODO: Fix below instructions.
-
-To create release build (optimized for deployment) run:
-```
-$ RELEASE=1 gulp clean build test
-```
-
-For debug build (with source maps, non minimized JS) just unset `RELEASE` variable:
-```
-$ RELEASE= gulp clean build test
-```
