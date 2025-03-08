@@ -9,7 +9,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015-rollup": "^3.0.0",
     "babel-register": "^6.26.0",
-    "browser-sync": "^2.26.14",
+    "browser-sync": "^3.0.3",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
     "gulp-babel": "^8.0.0",
